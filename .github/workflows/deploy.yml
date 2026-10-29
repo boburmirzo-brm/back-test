@@ -27,6 +27,6 @@ jobs:
             docker run -d \
               --name back-test \
               --restart unless-stopped \
-              -p 3001:3000 \
+              -p 127.0.0.1:3004:3000 \
               back-test:latest
             docker image prune -f
