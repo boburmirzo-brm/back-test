@@ -1,0 +1,32 @@
+
+name: Deploy Backend Server
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            cd /opt/back-test
+            git pull origin main
+            docker build -t back-test:latest .
+            docker rm -f back-test
+            docker run -d \
+              --name back-test \
+              --restart unless-stopped \
+              -p 3001:3000 \
+              back-test:latest
+            docker image prune -f
